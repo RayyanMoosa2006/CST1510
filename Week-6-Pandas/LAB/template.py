@@ -2,9 +2,9 @@
 RECORD CHECK  -  my version
 ===========================
 
-Name  :
-Lane  :  AI / Cyber / IT      (delete two)
-Date  :
+Name  : Rayyan
+Lane  :  AI / Data Science
+Date  : 30 October 2026
 
 Run it:   python template.py
 
@@ -19,7 +19,7 @@ import pandas as pd
 #    plus at least 5 data rows: label,value,limit (or your lane's own field
 #    names - same shape, different words).
 
-df = None   # replace with pd.read_csv("your_file.csv")
+df = pd.read_csv("ai_datasets.csv")
 
 
 # ================================================================= PROCESS
@@ -28,7 +28,10 @@ df = None   # replace with pd.read_csv("your_file.csv")
 #    Typical and above: also add a "status" column using .apply() with a
 #    lambda - "OVER LIMIT" (100%+), "WARNING" (90%+), otherwise "OK".
 
-# your column(s) go here
+df["percent"] = (df["rows_loaded"] / df["rows_expected"]) * 100
+df["status"] = df["percent"].apply(
+    lambda p: "OVER LIMIT" if p >= 100 else "WARNING" if p >= 90 else "OK"
+)
 
 
 # ================================================================== OUTPUT
@@ -42,6 +45,16 @@ df = None   # replace with pd.read_csv("your_file.csv")
 #                one bar chart of the counts per status.
 
 print(df)
+print(df[df["status"] != "OK"])
+print(df.groupby("status").size())
+df.to_csv("ai_datasets_report.csv", index=False)
+
+import matplotlib.pyplot as plt
+df["status"].value_counts().plot(kind="bar")
+plt.title("Dataset status counts")
+plt.tight_layout()
+plt.savefig("ai_status_counts.png")
+plt.show()
 
 
 # ==========================================================================
